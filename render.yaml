@@ -1,0 +1,28 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: ai-gameshow-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 -m uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ai-gameshow-db
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://ai-gameshow.vercel.app
+
+databases:
+  # PostgreSQL Database
+  - name: ai-gameshow-db
+    plan: free
+    databaseName: gameshow
+    user: gameshow_user
