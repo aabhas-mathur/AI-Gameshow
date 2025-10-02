@@ -4,8 +4,11 @@ services:
     name: ai-gameshow-backend
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: python3 -m uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
+    region: oregon
+    branch: gameshow_backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -19,10 +22,13 @@ services:
           property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://ai-gameshow.vercel.app
+      - key: PYTHONUNBUFFERED
+        value: 1
 
 databases:
   # PostgreSQL Database
   - name: ai-gameshow-db
     plan: free
+    region: oregon
     databaseName: gameshow
     user: gameshow_user
