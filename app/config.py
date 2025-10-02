@@ -30,7 +30,11 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> List[str]:
-        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
+        origins = [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
+        # Support wildcard for production deployments
+        if "*" in origins:
+            return ["*"]
+        return origins
 
     class Config:
         env_file = ".env"
