@@ -20,34 +20,43 @@ This guide covers deploying the AI Gameshow application using free hosting servi
 
 1. **Push your code to GitHub** (already done)
 
-2. **Create a new Web Service on Render**
+2. **Create PostgreSQL Database FIRST**
+   - Go to https://dashboard.render.com/
+   - Click "New +" → "PostgreSQL"
+   - Configure:
+     ```
+     Name: ai-gameshow-db
+     Database: gameshow
+     User: gameshow_user
+     Region: Oregon (US West)
+     PostgreSQL Version: 16
+     Plan: Free
+     ```
+   - Click "Create Database"
+   - **IMPORTANT**: Copy the "Internal Database URL" from the database page (you'll need this next)
+
+3. **Create a new Web Service on Render**
    - Go to https://dashboard.render.com/
    - Click "New +" → "Web Service"
    - Connect your GitHub repository: `aabhas-mathur/AI-Gameshow`
    - Select the `gameshow_backend` branch
 
-3. **Configure the Web Service**
+4. **Configure the Web Service**
    ```
    Name: ai-gameshow-backend
-   Region: Choose closest to your users
+   Region: Oregon (US West) - MUST match database region
    Branch: gameshow_backend
    Root Directory: (leave empty)
    Runtime: Python 3
-   Build Command: pip install -r requirements.txt
-   Start Command: python3 -m uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
+   Build Command: pip install --upgrade pip && pip install -r requirements.txt
+   Start Command: uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
+   Instance Type: Free
    ```
 
-4. **Create PostgreSQL Database on Render**
-   - Go to Render Dashboard
-   - Click "New +" → "PostgreSQL"
-   - Name: `ai-gameshow-db`
-   - Database: `gameshow`
-   - User: `gameshow_user`
-   - Region: Same as your web service
-   - Click "Create Database"
+   **IMPORTANT**: Do NOT use `python3 -m` prefix in the start command!
 
 5. **Add Environment Variables**
-   In your Web Service settings, add these environment variables:
+   In your Web Service settings → Environment tab, add these environment variables:
    ```
    DATABASE_URL=<Internal Database URL from PostgreSQL instance>
    SECRET_KEY=<generate-a-random-secret-key-here>
