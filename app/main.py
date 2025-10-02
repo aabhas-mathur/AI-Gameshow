@@ -2,15 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import socketio
 from app.config import settings
-from app.database import engine, Base
 from app.api import auth, rooms, game
 from app.websocket.events import sio
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Note: Database tables are managed by Alembic migrations
+# Run "alembic upgrade head" to create/update tables
 
 # Create FastAPI app
 app = FastAPI(
@@ -21,13 +20,15 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS middleware
+# CORS middleware - Must be permissive for deployment
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Include routers
