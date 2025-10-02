@@ -2,15 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import socketio
 from app.config import settings
-from app.database import engine, Base
 from app.api import auth, rooms, game
 from app.websocket.events import sio
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Note: Database tables are managed by Alembic migrations
+# Run "alembic upgrade head" to create/update tables
 
 # Create FastAPI app
 app = FastAPI(

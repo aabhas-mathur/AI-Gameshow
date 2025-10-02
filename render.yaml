@@ -8,7 +8,8 @@ services:
     branch: gameshow_backend
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /
+    healthCheckPath: /health
+    autoDeploy: true
     envVars:
       - key: ENVIRONMENT
         value: production
