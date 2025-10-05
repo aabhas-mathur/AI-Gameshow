@@ -29,7 +29,9 @@ async def register(user_data: UserCreate, response: Response, db: Session = Depe
         max_age=60 * 60 * 24 * 7,  # 7 days
     )
 
-    return AuthResponse(user=UserResponse.model_validate(user), message="Registration successful")
+    return AuthResponse(
+        user=UserResponse.model_validate(user), message="Registration successful", access_token=access_token
+    )
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -50,7 +52,7 @@ async def login(credentials: UserLogin, response: Response, db: Session = Depend
         max_age=60 * 60 * 24 * 7,  # 7 days
     )
 
-    return AuthResponse(user=UserResponse.model_validate(user), message="Login successful")
+    return AuthResponse(user=UserResponse.model_validate(user), message="Login successful", access_token=access_token)
 
 
 @router.post("/logout")
