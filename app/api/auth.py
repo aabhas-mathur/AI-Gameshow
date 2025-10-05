@@ -12,11 +12,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-async def register(
-    user_data: UserCreate,
-    response: Response,
-    db: Session = Depends(get_db)
-):
+async def register(user_data: UserCreate, response: Response, db: Session = Depends(get_db)):
     """Register a new user"""
     user = AuthService.register(user_data, db)
 
@@ -28,23 +24,16 @@ async def register(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,  # Set to True in production with HTTPS
-        samesite="lax",
-        max_age=60 * 60 * 24 * 7  # 7 days
+        secure=True,  # Required for cross-domain cookies
+        samesite="none",  # Required for cross-domain cookies
+        max_age=60 * 60 * 24 * 7,  # 7 days
     )
 
-    return AuthResponse(
-        user=UserResponse.model_validate(user),
-        message="Registration successful"
-    )
+    return AuthResponse(user=UserResponse.model_validate(user), message="Registration successful")
 
 
 @router.post("/login", response_model=AuthResponse)
-async def login(
-    credentials: UserLogin,
-    response: Response,
-    db: Session = Depends(get_db)
-):
+async def login(credentials: UserLogin, response: Response, db: Session = Depends(get_db)):
     """Login user"""
     user = AuthService.authenticate(credentials.email, credentials.password, db)
 
@@ -56,27 +45,22 @@ async def login(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,  # Set to True in production with HTTPS
-        samesite="lax",
-        max_age=60 * 60 * 24 * 7  # 7 days
+        secure=True,  # Required for cross-domain cookies
+        samesite="none",  # Required for cross-domain cookies
+        max_age=60 * 60 * 24 * 7,  # 7 days
     )
 
-    return AuthResponse(
-        user=UserResponse.model_validate(user),
-        message="Login successful"
-    )
+    return AuthResponse(user=UserResponse.model_validate(user), message="Login successful")
 
 
 @router.post("/logout")
 async def logout(response: Response):
     """Logout user"""
-    response.delete_cookie(key="access_token")
+    response.delete_cookie(key="access_token", secure=True, samesite="none")
     return {"message": "Logout successful"}
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user_info(
-    current_user: User = Depends(get_current_user)
-):
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user info"""
     return UserResponse.model_validate(current_user)
