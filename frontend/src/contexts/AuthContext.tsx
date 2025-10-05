@@ -48,13 +48,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     const response = await authAPI.login({ email, password });
     setUser(response.data.user);
-    socketService.connect();
+    socketService.connect(response.data.access_token);
   };
 
   const register = async (email: string, username: string, password: string) => {
     const response = await authAPI.register({ email, username, password });
     setUser(response.data.user);
-    socketService.connect();
+    socketService.connect(response.data.access_token);
   };
 
   const logout = async () => {
